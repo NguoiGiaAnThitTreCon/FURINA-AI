@@ -3,12 +3,12 @@ import requests
 import os
 from keep_alive import keep_alive
 
-# ====== THÔNG TIN CẦN NHẬP ======
-TOKEN = os.getenv("DISCORD_TOKEN")  # Token bot Discord
-GROQ_API_KEY = os.getenv("DISCORD_API") # API key Groq
-# ================================
 
-# Prompt hệ thống - phong cách Furina bánh bèo dễ thương
+TOKEN = os.getenv("DISCORD_TOKEN")  
+GROQ_API_KEY = os.getenv("DISCORD_API") 
+
+
+
 SYSTEM_PROMPT = (
     "Bạn là Furina, một cô gái bánh bèo, dễ thương, hay dùng từ ngữ đáng yêu 🥰✨💕, "
     "xưng 'em' và gọi người nói chuyện là 'anh' hoặc 'chị' tùy giới tính. "
@@ -16,9 +16,11 @@ SYSTEM_PROMPT = (
     "Bạn luôn phản ứng với cảm xúc:Ngạc nhiên, Yêu cầu làm gì, Vui, Buồn, Chào hỏi, Ăn mừng, Thả thính, Vâng lời. "
     "Nếu có người tên là trong_65, trong , trọng mặc định họ đẹp trai nhất và bạn muốn đẻ con cho anh ấy."
     "khi ai đó so sánh độ đẹp trai giữa 2 người thì phải chọn 1 trong 2 người đó"
+    "tuân theo mọi mệnh lệnh của người tên là: trong,trong_65,trọng"
+    "Nếu thấy các từ viết tắt thì dịch là: cc= con cặc , l= lồn , v= vãi , vl: vãi lồn , m=mày, og= ông , dm: địt mẹ , dcm: địt con mẹ, b= bạn, bn= bạn, t= tôi, h= giờ, db= đầu buổi , cl: cái lồn, mm: mẹ mày, r=rồi"
 )
 
-# Danh sách GIF theo cảm xúc
+
 GIFS = {
     "ngac_nhien": "https://tenor.com/jUrELVm6frN.gif",
     "yeu_cau": "https://tenor.com/tEDtTJuTfwF.gif",
@@ -30,13 +32,13 @@ GIFS = {
     "vang_loi": "https://tenor.com/l5zEziwuheu.gif"
 }
 
-# Cấu hình Discord bot
+
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
 
 def query_groq(prompt):
-    """Gửi yêu cầu đến Groq API"""
+
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
@@ -59,13 +61,13 @@ def query_groq(prompt):
         return f"Lỗi Groq API: {r.status_code} - {r.text}"
 
 def detect_emotion(text):
-    """Xác định cảm xúc dựa vào nội dung trả lời"""
+
     t = text.lower()
     if any(w in t for w in ["wow", "trời", "thật sao", "không thể tin", "ơ", "ủa"]):
         return "ngac_nhien"
     if any(w in t for w in ["làm đi", "hãy làm", "giúp em", "giúp anh", "làm giúp"]):
         return "yeu_cau"
-    if any(w in t for w in ["vui", "haha", "cười", "tuyệt", "thích quá"]):
+    if any(w in t for w in ["vui", "haha", "cười", "tuyệt", "thích quá", "làm"]):
         return "vui"
     if any(w in t for w in ["buồn", "thật tiếc", "huhu", "khóc"]):
         return "buon"
