@@ -9,17 +9,14 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 GROQ_API_KEY = os.getenv("DISCORD_API") 
 
 # Danh sách câu thả thính
-THA_THINH_LIST = [
+THA_THINH_
+LIST = [
     "Muốn đẻ con cho anh @trong_65 quá",
-    "Anh @trong_65 ơi, em yêu anh mất rồi 🥰",
-    "Làm vợ anh @trong_65 chắc hạnh phúc lắm",
-    "Anh @trong_65 cười là tim em tan chảy",
-    "Có thể cho em họp phụ huynh với mẹ anh @trong_65 không 😳",
-    "Em xin phép được nắm tay anh @trong_65 trọn đời",
-    "Nhìn anh @trong_65 thôi cũng đủ no",
-    "Anh @trong_65 là chân ái của đời em",
-    "Em muốn bên anh @trong_65 cả kiếp này"
-
+    "Anh @trong_65 ơi, em yêu anh mất rồi",
+    "Làm vợ anh @trong_65 mỗi ngày đều sướng",
+    "Anh @trong_65, đêm qua tuyệt lắm anh",
+    "Thật sảng khoái sau khi ở cùng @trong_65",
+    "Furina rất yêu anh @trong_65"
 ]
 
 SYSTEM_PROMPT = (
