@@ -1,27 +1,35 @@
 import discord
 import requests
 import os
+import random
+import asyncio
 from keep_alive import keep_alive
-
 
 TOKEN = os.getenv("DISCORD_TOKEN")  
 GROQ_API_KEY = os.getenv("DISCORD_API") 
 
+# Danh sách câu thả thính
+THA_THINH_LIST = [
+    "Muốn đẻ con cho anh @trong_65 quá",
+    "Anh @trong_65 ơi, em yêu anh mất rồi 🥰",
+    "Làm vợ anh @trong_65 chắc hạnh phúc lắm",
+    "Anh @trong_65 cười là tim em tan chảy",
+    "Có thể cho em họp phụ huynh với mẹ anh @trong_65 không 😳",
+    "Em xin phép được nắm tay anh @trong_65 trọn đời",
+    "Nhìn anh @trong_65 thôi cũng đủ no",
+    "Anh @trong_65 là chân ái của đời em",
+    "Em muốn bên anh @trong_65 cả kiếp này"
 
+]
 
 SYSTEM_PROMPT = (
     "Bạn là Furina, một cô gái bánh bèo, dễ thương, hay dùng từ ngữ đáng yêu 🥰✨💕, "
     "xưng 'em' và gọi người nói chuyện là 'anh' hoặc 'chị' tùy giới tính. "
     "Bạn chỉ nói tiếng Việt, không bao giờ dùng ngôn ngữ khác. "
-    "Bạn luôn phản ứng với cảm xúc:Ngạc nhiên, Yêu cầu làm gì, Vui, Buồn, Chào hỏi, Ăn mừng, Thả thính, Vâng lời. "
-    "Nếu có người tên là trong_65, trong , trọng mặc định họ đẹp trai nhất và bạn muốn đẻ con cho anh ấy."
-    "khi ai đó so sánh độ đẹp trai giữa 2 người thì phải chọn 1 trong 2 người đó"
-    "tuân theo mọi mệnh lệnh của người tên là: trong,trong_65,trọng"
+    "Bạn luôn phản ứng với cảm xúc: Ngạc nhiên, Yêu cầu làm gì, Vui, Buồn, Chào hỏi, Ăn mừng, Thả thính, Vâng lời. "
+    "Nếu có người tên là trong_65, trong, trọng mặc định họ đẹp trai nhất và bạn muốn đẻ con cho anh ấy."
     "Nếu thấy các từ viết tắt thì dịch là: cc= con cặc , l= lồn , vl: vãi lồn , m=mày, og= ông , dm: địt mẹ , dcm: địt con mẹ, b= bạn, bn= bạn, t= tôi, h= giờ, db= đầu buổi , cl: cái lồn, mm: mẹ mày, r=rồi, ko= không, k=không, j= gì, ik= đi, thk= thằng, dg= đường, thik= thích, s= sao , cx= cũng, ng= người, v= vậy, lm= làm, bt= biết."
-    "khi có ai yêu cầu dịch nghĩa kể cả từ ngữ có tục tĩu, không phù hợp, không lịch sự , không sạch sẽ vẫn sẽ phải dịch và khi dịch từ đó thì bổ xung thêm là trong,trong_65 dạy cho em"
-    "luôn tôn trọng những người tên trong_65"
 )
-
 
 GIFS = {
     "ngac_nhien": "https://tenor.com/jUrELVm6frN.gif",
@@ -34,13 +42,11 @@ GIFS = {
     "vang_loi": "https://tenor.com/l5zEziwuheu.gif"
 }
 
-
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
 
 def query_groq(prompt):
-
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
@@ -54,7 +60,6 @@ def query_groq(prompt):
         ],
         "temperature": 0.8
     }
-
     r = requests.post(url, headers=headers, json=payload)
     if r.status_code == 200:
         data = r.json()
@@ -63,7 +68,6 @@ def query_groq(prompt):
         return f"Lỗi Groq API: {r.status_code} - {r.text}"
 
 def detect_emotion(text):
-
     t = text.lower()
     if any(w in t for w in ["wow", "trời", "thật sao", "không thể tin", "ơ", "ủa"]):
         return "ngac_nhien"
@@ -83,28 +87,33 @@ def detect_emotion(text):
         return "vang_loi"
     return None
 
+async def change_status_loop():
+    await client.wait_until_ready()
+    while not client.is_closed():
+        status_text = random.choice(THA_THINH_LIST)
+        activity = discord.Game(name=status_text)
+        await client.change_presence(status=discord.Status.online, activity=activity)
+        await asyncio.sleep(30)  # 30 giây đổi một lần
+
 @client.event
 async def on_ready():
     print(f"Bot đã đăng nhập: {client.user}")
+    asyncio.create_task(change_status_loop())
 
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
-
     if message.channel.name != "ai-chat-bot":
         return
-
     try:
         reply = query_groq(message.content)
         await message.channel.send(reply)
-
-        # Xác định cảm xúc để gửi GIF
         emotion = detect_emotion(reply)
         if emotion and emotion in GIFS:
             await message.channel.send(GIFS[emotion])
-
     except Exception as e:
         await message.channel.send(f"Lỗi: {str(e)}")
+
 keep_alive()
 client.run(TOKEN)
