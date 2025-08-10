@@ -9,8 +9,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 GROQ_API_KEY = os.getenv("DISCORD_API") 
 
 # Danh sách câu thả thính
-THA_THINH_
-LIST = [
+THA_THINH_LIST = [
     "Muốn đẻ con cho anh @trong_65 quá",
     "Anh @trong_65 ơi, em yêu anh mất rồi",
     "Làm vợ anh @trong_65 mỗi ngày đều sướng",
